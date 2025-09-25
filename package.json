@@ -1,0 +1,15 @@
+{
+    "name": "com.deonti.debri",
+    "version": "0.0.1",
+    "displayName": "Debri",
+    "description": "Simple Unity toolkit by Deonti.",
+    "unity": "6000.0",
+    "dependencies": {
+    },
+    "keywords": [
+    ],
+    "author": {
+        "name": "Deonti",
+        "url": "https://github.com/deonti"
+    }
+}
