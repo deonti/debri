@@ -1,10 +1,27 @@
 ﻿using System;
+using System.Collections;
+using Debri.Common.Internal;
 using UnityEngine;
 
 namespace Debri.Common
 {
   public static class GameObjectUtils
   {
+    /// <summary>
+    /// Starts a coroutine on a game object
+    /// </summary>
+    /// <param name="gameObject">
+    /// The game object to start the coroutine on
+    /// </param>
+    /// <param name="routine">
+    /// The coroutine to start
+    /// </param>
+    /// <returns>
+    /// Reference to started coroutine
+    /// </returns>
+    public static Coroutine StartCoroutine(this GameObject gameObject, IEnumerator routine) =>
+      CoroutineRunner.StartCoroutine(gameObject, routine);
+
     /// <summary>
     /// Returns component of type TComponent from game object or adds it if it doesn't exist
     /// </summary>
