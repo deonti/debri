@@ -1,0 +1,14 @@
+{
+    "name": "Debri.Pools",
+    "rootNamespace": "Debri.Pools",
+    "references": ["GUID:2b0dc40f3d2058241b8ed04aafb43b20"],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
