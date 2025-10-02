@@ -1,0 +1,18 @@
+{
+    "name": "Debri.Common.Editor",
+    "rootNamespace": "Debri.Common.Editor",
+    "references": [
+        "Debri.Common"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
