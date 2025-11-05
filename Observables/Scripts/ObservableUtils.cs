@@ -54,5 +54,27 @@ namespace Debri.Observables
     /// <returns> An observable that merges the observables.</returns>
     public static IObservable<TValue> Merge<TValue>(this IEnumerable<IObservable<TValue>> observables) =>
       new ObservableMerger<TValue>(observables);
+
+    /// <summary>
+    /// Map readonly observable property to another type.
+    /// </summary>
+    /// <param name="property"> Source observable property.</param>
+    /// <param name="sourceValueToValue"> Mapper function.</param>
+    /// <returns> An observable property that maps the values.</returns>
+    public static IReadonlyObservableProperty<TValue> Map<TSourceValue, TValue>(
+      this IReadonlyObservableProperty<TSourceValue> property,
+      Func<TSourceValue, TValue> sourceValueToValue) =>
+      new MappedReadonlyObservableProperty<TSourceValue, TValue>(property, sourceValueToValue);
+
+    /// <summary>
+    /// Map observable property to another type.</summary>
+    /// <param name="property"> Source observable property.</param>
+    /// <param name="sourceValueToValue"> Mapper function.</param>
+    /// <param name="valueToSourceValue"> Mapper function.</param>
+    /// <returns> An observable property that maps the values.</returns>
+    public static IObservableProperty<TValue> Map<TSourceValue, TValue>(
+      this IObservableProperty<TSourceValue> property,
+      Func<TSourceValue, TValue> sourceValueToValue, Func<TValue, TSourceValue> valueToSourceValue) =>
+      new MappedObservableProperty<TSourceValue, TValue>(property, sourceValueToValue, valueToSourceValue);
   }
 }
