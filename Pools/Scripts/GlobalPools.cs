@@ -13,6 +13,8 @@ namespace Debri.Pools
   /// </remarks>
   public static class GlobalPools
   {
+    internal static Transform DefaultPoolItemsParent;
+
     private static readonly Dictionary<Object, IObjectPool<GameObject>> _poolsMap = new();
 
 #if UNITY_EDITOR
@@ -90,7 +92,8 @@ namespace Debri.Pools
 
         if (!instance)
         {
-          instance = Object.Instantiate(_prototype, _prototype.transform.parent);
+          Transform parent = _prototype.transform.parent ? _prototype.transform.parent : DefaultPoolItemsParent;
+          instance = Object.Instantiate(_prototype, parent);
           foreach (IPoolItemCreateHandler createHandler in instance.GetComponents<IPoolItemCreateHandler>())
             createHandler.OnCreate(this);
         }
