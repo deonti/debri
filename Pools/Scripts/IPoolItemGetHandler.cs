@@ -11,8 +11,6 @@
     /// <summary>
     /// Called when an item is gotten from one of the pools from <see cref="GlobalPools"/>.
     /// </summary>
-    void OnGet()
-    {
-    }
+    void OnGet();
   }
 }

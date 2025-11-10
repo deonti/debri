@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Debri.Pools.Internals;
 using UnityEngine;
 using UnityEngine.Pool;
 using Object = UnityEngine.Object;
@@ -13,6 +14,8 @@ namespace Debri.Pools
   /// </remarks>
   public static class GlobalPools
   {
+    internal static Transform DefaultPoolItemsParent;
+
     private static readonly Dictionary<Object, IObjectPool<GameObject>> _poolsMap = new();
 
 #if UNITY_EDITOR
@@ -69,90 +72,5 @@ namespace Debri.Pools
 
     private static IObjectPool<GameObject> NewGameObjectPool(GameObject prototype) =>
       new GameObjectPool(prototype);
-
-    private readonly struct GameObjectPool : IObjectPool<GameObject>
-    {
-      private readonly GameObject _prototype;
-      private readonly Stack<GameObject> _instances;
-
-      public GameObjectPool(GameObject prototype)
-      {
-        _instances = new Stack<GameObject>();
-        _prototype = prototype;
-      }
-
-      public GameObject Get()
-      {
-        GameObject instance;
-        while (_instances.TryPop(out instance) && !instance)
-        {
-        }
-
-        if (!instance)
-        {
-          instance = Object.Instantiate(_prototype, _prototype.transform.parent);
-          foreach (IPoolItemCreateHandler createHandler in instance.GetComponents<IPoolItemCreateHandler>())
-            createHandler.OnCreate(this);
-        }
-
-        instance.SetActive(true);
-
-        foreach (IPoolItemGetHandler getHandler in instance.GetComponents<IPoolItemGetHandler>())
-          getHandler.OnGet();
-
-        return instance;
-      }
-
-      public PooledObject<GameObject> Get(out GameObject instance) =>
-        new(instance = Get(), this);
-
-      public void Release(GameObject instance)
-      {
-        if (!instance) return;
-
-        instance.SetActive(false);
-
-        foreach (IPoolItemReleaseHandler releaseHandler in instance.GetComponents<IPoolItemReleaseHandler>())
-          releaseHandler.OnRelease();
-
-        _instances.Push(instance);
-      }
-
-      public void Clear()
-      {
-        while (_instances.TryPop(out GameObject instance))
-        {
-          if (!instance) continue;
-
-          Object.Destroy(instance);
-        }
-      }
-
-      public int CountInactive =>
-        _instances.Count;
-    }
-
-    private readonly struct ComponentPoolWrapper<TComponent> : IObjectPool<TComponent> where TComponent : Component
-    {
-      private readonly IObjectPool<GameObject> _pool;
-
-      public ComponentPoolWrapper(IObjectPool<GameObject> pool) =>
-        _pool = pool;
-
-      public TComponent Get() =>
-        _pool.Get().GetComponent<TComponent>();
-
-      public PooledObject<TComponent> Get(out TComponent instance) =>
-        new(instance = Get(), this);
-
-      public void Release(TComponent instance) =>
-        _pool.Release(instance.gameObject);
-
-      public void Clear() =>
-        _pool.Clear();
-
-      public int CountInactive =>
-        _pool.CountInactive;
-    }
   }
 }
