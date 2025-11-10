@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Pool;
 
 namespace Debri.Pools
 {
@@ -8,18 +7,12 @@ namespace Debri.Pools
   /// </summary>
   [AddComponentMenu("Debri/Pools/Pool Item Actions")]
   [DisallowMultipleComponent]
-  public class PoolItemActions : MonoBehaviour, IPoolItemCreateHandler
+  public class PoolItemActions : MonoBehaviour
   {
-    private IObjectPool<GameObject> _owner;
-
     /// <summary>
-    /// Releases item back to pool.
+    /// Releases item back to pool or destroys if it's not from pool.
     /// </summary>
-    /// <param name="item">Item to release. </param>
-    public void Release(GameObject item) =>
-      _owner.Release(item);
-
-    void IPoolItemCreateHandler.OnCreate(IObjectPool<GameObject> owner) =>
-      _owner = owner;
+    public void ReleaseOrDestroy() =>
+      gameObject.ReleaseOrDestroy();
   }
 }

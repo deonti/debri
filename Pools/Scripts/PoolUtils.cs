@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using Debri.Common;
 using UnityEngine;
@@ -11,21 +10,6 @@ namespace Debri.Pools
   /// </remarks>
   public static class PoolUtils
   {
-    /// <summary>
-    /// Gets an item from the pool and adds a release handler to it.
-    /// </summary>
-    /// <typeparam name="TItem">The type of item to get.</typeparam>
-    /// <param name="pool">The pool to get an item from.</param>
-    /// <param name="onRelease">The release handler to add to the item.</param>
-    /// <returns>The item from the pool.</returns>
-    public static TItem Get<TItem>(this IObjectPool<TItem> pool, Action onRelease)
-      where TItem : Component
-    {
-      TItem item = pool.Get();
-      item.gameObject.GetOrAddComponent<Agent>().SetReleaseHandler(onRelease);
-      return item;
-    }
-
     /// <summary>
     /// Releases multiple items at once.
     /// </summary>
@@ -55,22 +39,6 @@ namespace Debri.Pools
     {
       yield return new WaitForSeconds(delay);
       pool.Release(instance);
-    }
-
-    private class Agent : MonoBehaviour, IPoolItemReleaseHandler
-    {
-      private Action _releaseHandler;
-
-      public void SetReleaseHandler(Action value) =>
-        _releaseHandler = value;
-
-      void IPoolItemReleaseHandler.OnRelease()
-      {
-        if (_releaseHandler is null) return;
-
-        _releaseHandler.Invoke();
-        _releaseHandler = null;
-      }
     }
   }
 }
