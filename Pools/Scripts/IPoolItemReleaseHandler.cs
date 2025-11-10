@@ -11,8 +11,6 @@
     /// <summary>
     /// Called when an item is released to one of the pools from <see cref="GlobalPools"/>.
     /// </summary>
-    void OnRelease()
-    {
-    }
+    void OnRelease();
   }
 }
