@@ -1,0 +1,18 @@
+{
+    "name": "Debri.Observables.Editor",
+    "rootNamespace": "Debri.Observables.Editor",
+    "references": [
+        "GUID:fdb998bc84dc7bd49a4f7960a20bd086"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
