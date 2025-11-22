@@ -33,12 +33,12 @@ namespace Debri.Pools.Internals
 
     public void ProcessRelease()
     {
-      gameObject.SetActive(false);
-
       foreach (IPoolItemReleaseHandler releaseHandler in GetComponents<IPoolItemReleaseHandler>())
         releaseHandler.OnRelease();
       while (_scheduledReleaseHandlers.TryDequeue(out Action onRelease))
         onRelease();
+
+      gameObject.SetActive(false);
     }
 
     public void ScheduleReleaseHandler(Action onRelease) =>
