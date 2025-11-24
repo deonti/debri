@@ -11,6 +11,13 @@ namespace Debri.Observables.Internals
     public MappedReadonlyObservableProperty(IReadonlyObservableProperty<TSourceValue> source, Func<TSourceValue, TValue> sourceValueToValue) =>
       _subscription = source.Subscribe(new SourceObserver(this, sourceValueToValue));
 
+    public override IDisposable Subscribe(IObserver<TValue> observer)
+    {
+      IDisposable subscription = base.Subscribe(observer);
+      observer.OnNext(Value);
+      return subscription;
+    }
+
     public void Dispose()
     {
       if (_subscription is null) return;
