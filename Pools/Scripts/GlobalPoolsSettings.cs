@@ -8,6 +8,7 @@ namespace Debri.Pools
   /// </summary>
   [AddComponentMenu("Debri/Pools/Global Pools Settings")]
   [DisallowMultipleComponent]
+  [DefaultExecutionOrder(-1000)]
   public class GlobalPoolsSettings : MonoBehaviour
   {
     [SerializeField] private Transform _defaultPoolItemsParent;
