@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Debri.Pools.Internals;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -14,9 +15,22 @@ namespace Debri.Pools
   /// </remarks>
   public static class GlobalPools
   {
-    internal static Transform DefaultPoolItemsParent;
+    internal static Transform DefaultPoolItemsParent
+    {
+      get => _defaultPoolItemsParent;
+      set
+      {
+        if (_defaultPoolItemsParent == value) return;
+
+        _defaultPoolItemsParent = value;
+        OnDefaultPoolItemsParentChanged?.Invoke();
+      }
+    }
+
+    internal static event Action OnDefaultPoolItemsParentChanged;
 
     private static readonly Dictionary<Object, IObjectPool<GameObject>> _poolsMap = new();
+    private static Transform _defaultPoolItemsParent;
 
 #if UNITY_EDITOR
     [UnityEditor.InitializeOnEnterPlayMode]

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Debri.Pools.Internals
 {
@@ -20,6 +21,8 @@ namespace Debri.Pools.Internals
       GameObject gameObject = Instantiate(prototype, GetTempParent());
       gameObject.SetActive(false);
       gameObject.transform.SetParent(parent, false);
+      if (!parent)
+        SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene());
 
       var item = gameObject.AddComponent<GameObjectPoolItem>();
       item.hideFlags = HideFlags.HideAndDontSave;

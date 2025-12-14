@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using UnityEngine.SceneManagement;
 
 namespace Debri.Pools.Internals
 {
-  internal readonly struct GameObjectPool : IObjectPool<GameObject>, IPrewarmable
+  internal class GameObjectPool : IObjectPool<GameObject>, IPrewarmable
   {
     private readonly GameObject _prototype;
-    private readonly Transform _container;
+    private Transform _container;
     private readonly List<GameObjectPoolItem> _items;
 
     public GameObjectPool(GameObject prototype)
@@ -15,6 +16,10 @@ namespace Debri.Pools.Internals
       _prototype = prototype;
       _container = _prototype.transform.parent ? _prototype.transform.parent : GlobalPools.DefaultPoolItemsParent;
       _items = new List<GameObjectPoolItem>();
+
+      if (_container == GlobalPools.DefaultPoolItemsParent)
+        GlobalPools.OnDefaultPoolItemsParentChanged += () => _container = GlobalPools.DefaultPoolItemsParent;
+      SceneManager.sceneUnloaded += RemoveInvalids;
     }
 
     public PooledObject<GameObject> Get(out GameObject instance) =>
@@ -64,6 +69,9 @@ namespace Debri.Pools.Internals
 
     private GameObjectPoolItem InstantiateItem() =>
       GameObjectPoolItem.Instantiate(this, _prototype, _container);
+
+    private void RemoveInvalids(Scene _) =>
+      _items.RemoveAll(item => !item);
 
     void IPrewarmable.Prewarm(int count)
     {
