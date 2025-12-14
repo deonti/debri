@@ -15,6 +15,8 @@ namespace Debri.Pools
   /// </remarks>
   public static class GlobalPools
   {
+    internal static bool SuppressWarnings;
+
     internal static Transform DefaultPoolItemsParent
     {
       get => _defaultPoolItemsParent;

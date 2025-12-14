@@ -12,6 +12,7 @@ namespace Debri.Pools
   public class GlobalPoolsSettings : MonoBehaviour
   {
     [SerializeField] private Transform _defaultPoolItemsParent;
+    [SerializeField] private bool _suppressWarnings;
 
     private static GlobalPoolsSettings _instance;
 
@@ -23,9 +24,14 @@ namespace Debri.Pools
       _instance = this;
 
       GlobalPools.DefaultPoolItemsParent = _defaultPoolItemsParent;
+      GlobalPools.SuppressWarnings = _suppressWarnings;
     }
 
-    private void OnDestroy() =>
+    private void OnDestroy()
+    {
       _instance = null;
+      GlobalPools.DefaultPoolItemsParent = null;
+      GlobalPools.SuppressWarnings = false;
+    }
   }
 }

@@ -78,5 +78,8 @@ namespace Debri.Pools.Internals
       for (int i = CountInactive; i < count; i++)
         _items.Add(InstantiateItem());
     }
+
+    public void LogWarning(object message) =>
+      Debug.LogWarning(message, _prototype);
   }
 }

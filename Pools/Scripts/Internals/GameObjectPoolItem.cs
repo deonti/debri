@@ -13,8 +13,13 @@ namespace Debri.Pools.Internals
     private readonly Queue<Action> _scheduledReleaseHandlers = new();
     private static Transform _tempParent;
 
-    private void OnDestroy() =>
+    private void OnDestroy()
+    {
+      if (!GlobalPools.SuppressWarnings && gameObject.scene.isLoaded)
+        Owner.LogWarning($"Pool item {gameObject.name} has been destroyed and will be removed from pool");
+
       Owner.Remove(this);
+    }
 
     public static GameObjectPoolItem Instantiate(GameObjectPool owner, GameObject prototype, Transform parent)
     {
