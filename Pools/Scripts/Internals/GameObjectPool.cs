@@ -4,7 +4,7 @@ using UnityEngine.Pool;
 
 namespace Debri.Pools.Internals
 {
-  internal readonly struct GameObjectPool : IObjectPool<GameObject>
+  internal readonly struct GameObjectPool : IObjectPool<GameObject>, IPrewarmable
   {
     private readonly GameObject _prototype;
     private readonly Transform _container;
@@ -24,7 +24,7 @@ namespace Debri.Pools.Internals
     {
       GameObjectPoolItem item;
       if (_items.Count == 0)
-        item = GameObjectPoolItem.Instantiate(this, _prototype, _container);
+        item = InstantiateItem();
       else
       {
         item = _items[^1];
@@ -61,5 +61,14 @@ namespace Debri.Pools.Internals
 
     public int CountInactive =>
       _items.Count;
+
+    private GameObjectPoolItem InstantiateItem() =>
+      GameObjectPoolItem.Instantiate(this, _prototype, _container);
+
+    void IPrewarmable.Prewarm(int count)
+    {
+      for (int i = CountInactive; i < count; i++)
+        _items.Add(InstantiateItem());
+    }
   }
 }

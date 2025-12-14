@@ -3,7 +3,7 @@ using UnityEngine.Pool;
 
 namespace Debri.Pools.Internals
 {
-  internal readonly struct ComponentPoolWrapper<TComponent> : IObjectPool<TComponent> where TComponent : Component
+  internal readonly struct ComponentPoolWrapper<TComponent> : IObjectPool<TComponent>, IPrewarmable where TComponent : Component
   {
     private readonly IObjectPool<GameObject> _pool;
 
@@ -24,5 +24,8 @@ namespace Debri.Pools.Internals
 
     public int CountInactive =>
       _pool.CountInactive;
+
+    void IPrewarmable.Prewarm(int count) =>
+      _pool.Prewarm(count);
   }
 }

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Debri.Common;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -10,6 +11,20 @@ namespace Debri.Pools
   /// </remarks>
   public static class PoolUtils
   {
+    /// <summary>
+    /// Prewarms the pool.
+    /// </summary>
+    /// <param name="pool">The pool to prewarm.</param>
+    /// <param name="count">The number of items to prewarm.</param>
+    public static void Prewarm<TItem>(this IObjectPool<TItem> pool, int count)
+      where TItem : class
+    {
+      if (pool is IPrewarmable prewarmable)
+        prewarmable.Prewarm(count);
+      else
+        pool.FallbackPrewarm(count);
+    }
+
     /// <summary>
     /// Releases multiple items at once.
     /// </summary>
@@ -39,6 +54,17 @@ namespace Debri.Pools
     {
       yield return new WaitForSeconds(delay);
       pool.Release(instance);
+    }
+
+    private static void FallbackPrewarm<TItem>(this IObjectPool<TItem> pool, int count) where TItem : class
+    {
+      using PooledObject<List<TItem>> _ = ListPool<TItem>.Get(out List<TItem> items);
+
+      for (int i = pool.CountInactive; i < count; i++)
+        items.Add(pool.Get());
+
+      foreach (TItem item in items)
+        pool.Release(item);
     }
   }
 }

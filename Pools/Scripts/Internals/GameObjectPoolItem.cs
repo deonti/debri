@@ -10,13 +10,17 @@ namespace Debri.Pools.Internals
     public GameObjectPool Owner { get; private set; }
 
     private readonly Queue<Action> _scheduledReleaseHandlers = new();
+    private static Transform _tempParent;
 
     private void OnDestroy() =>
       Owner.Remove(this);
 
     public static GameObjectPoolItem Instantiate(GameObjectPool owner, GameObject prototype, Transform parent)
     {
-      GameObject gameObject = Instantiate(prototype, parent);
+      GameObject gameObject = Instantiate(prototype, GetTempParent());
+      gameObject.SetActive(false);
+      gameObject.transform.SetParent(parent, false);
+
       var item = gameObject.AddComponent<GameObjectPoolItem>();
       item.hideFlags = HideFlags.HideAndDontSave;
       item.Owner = owner;
@@ -43,5 +47,18 @@ namespace Debri.Pools.Internals
 
     public void ScheduleReleaseHandler(Action onRelease) =>
       _scheduledReleaseHandlers.Enqueue(onRelease);
+
+    private static Transform GetTempParent()
+    {
+      if (_tempParent)
+        return _tempParent;
+
+      var tempParentObject = new GameObject("Temp PoolItems Parent");
+      tempParentObject.SetActive(false);
+      tempParentObject.hideFlags = HideFlags.HideAndDontSave;
+      DontDestroyOnLoad(tempParentObject);
+      _tempParent = tempParentObject.transform;
+      return _tempParent;
+    }
   }
 }
