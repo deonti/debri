@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Debri.Common;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Debri.Pools.Internals
 {
@@ -11,7 +11,6 @@ namespace Debri.Pools.Internals
     public GameObjectPool Owner { get; private set; }
 
     private readonly Queue<Action> _scheduledReleaseHandlers = new();
-    private static Transform _tempParent;
 
     private void OnDestroy()
     {
@@ -23,13 +22,9 @@ namespace Debri.Pools.Internals
 
     public static GameObjectPoolItem Instantiate(GameObjectPool owner, GameObject prototype, Transform parent)
     {
-      GameObject gameObject = Instantiate(prototype, GetTempParent());
-      gameObject.SetActive(false);
-      gameObject.transform.SetParent(parent, false);
-      if (!parent)
-        SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene());
-
-      var item = gameObject.AddComponent<GameObjectPoolItem>();
+      var item = ObjectUtils
+        .InstantiateInactive(prototype, parent)
+        .AddComponent<GameObjectPoolItem>();
       item.hideFlags = HideFlags.HideAndDontSave;
       item.Owner = owner;
       return item;
@@ -55,18 +50,5 @@ namespace Debri.Pools.Internals
 
     public void ScheduleReleaseHandler(Action onRelease) =>
       _scheduledReleaseHandlers.Enqueue(onRelease);
-
-    private static Transform GetTempParent()
-    {
-      if (_tempParent)
-        return _tempParent;
-
-      var tempParentObject = new GameObject("Temp PoolItems Parent");
-      tempParentObject.SetActive(false);
-      tempParentObject.hideFlags = HideFlags.HideAndDontSave;
-      DontDestroyOnLoad(tempParentObject);
-      _tempParent = tempParentObject.transform;
-      return _tempParent;
-    }
   }
 }
