@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace Debri.Observables
 {
@@ -21,8 +22,13 @@ namespace Debri.Observables
         if (!Validate(_currentValue, ref value)) return;
 
         _currentValue = value;
-        foreach (IObserver<TValue> observer in Observers)
-          observer.OnNext(value);
+
+        using (ListPool<IObserver<TValue>>.Get(out List<IObserver<TValue>> observers))
+        {
+          observers.AddRange(Observers);
+          foreach (IObserver<TValue> observer in observers)
+            observer.OnNext(value);
+        }
       }
     }
 
