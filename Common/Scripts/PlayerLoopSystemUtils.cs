@@ -24,6 +24,16 @@ namespace Debri.Common
         throw new Exception($"System of type {parentSystemType.Name} not found");
     }
 
+    /// <summary>
+    /// Removes a subsystem from a parent system if it exists
+    /// </summary>
+    /// <param name="rootSystem">Root PlayerLoopSystem</param>
+    /// <param name="subSystemType">Subsystem to remove</param>
+    /// <typeparam name="TParentSystem">Type of the parent system</typeparam>
+    /// <returns>True if the subsystem was removed</returns>
+    public static bool TryRemoveSubSystemFrom<TParentSystem>(this ref PlayerLoopSystem rootSystem, Type subSystemType) =>
+      TryRemoveSubSystemFrom(ref rootSystem, typeof(TParentSystem), subSystemType);
+
     private static bool TryAddSubSystemTo(ref PlayerLoopSystem currentSystem, Type parentSystemType, PlayerLoopSystem subSystem)
     {
       if (currentSystem.type == parentSystemType)
@@ -41,6 +51,31 @@ namespace Debri.Common
         for (int index = 0; index < currentSystem.subSystemList.Length; index++)
           if (TryAddSubSystemTo(ref currentSystem.subSystemList[index], parentSystemType, subSystem))
             return true;
+
+      return false;
+    }
+
+    private static bool TryRemoveSubSystemFrom(ref PlayerLoopSystem currentSystem, Type parentSystemType, Type subSystemType)
+    {
+      if (currentSystem.subSystemList is null)
+        return false;
+
+      if (currentSystem.type == parentSystemType)
+      {
+        int subSystemIndex = Array.FindIndex(currentSystem.subSystemList, system => system.type == subSystemType);
+        if (subSystemIndex > -1)
+        {
+          for (int index = subSystemIndex; index < currentSystem.subSystemList.Length - 1; index++)
+            currentSystem.subSystemList[index] = currentSystem.subSystemList[index + 1];
+
+          Array.Resize(ref currentSystem.subSystemList, currentSystem.subSystemList.Length - 1);
+          return true;
+        }
+      }
+
+      for (int index = 0; index < currentSystem.subSystemList.Length; index++)
+        if (TryRemoveSubSystemFrom(ref currentSystem.subSystemList[index], parentSystemType, subSystemType))
+          return true;
 
       return false;
     }
