@@ -8,6 +8,8 @@ namespace Debri.Common
   /// </summary>
   public sealed class Disposable : IDisposable
   {
+    public static readonly IDisposable Dummy = new Disposable(static () => { });
+
     private Action _disposer;
     private readonly RepeatedDisposeMode _mode;
     private bool _isDisposed;
