@@ -1,7 +1,10 @@
 {
     "name": "Debri.PlayerLoop",
     "rootNamespace": "Debri.PlayerLoop",
-    "references": [],
+    "references": [
+        "GUID:2b0dc40f3d2058241b8ed04aafb43b20",
+        "GUID:7f4d4bcd1a79f6444844b1c818ecaf41"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
