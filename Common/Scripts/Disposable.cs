@@ -31,7 +31,7 @@ namespace Debri.Common
         switch (_mode)
         {
           case RepeatedDisposeMode.Ignore:
-            break;
+            return;
           case RepeatedDisposeMode.Throw:
             throw new ObjectDisposedException(nameof(Disposable));
           default:
