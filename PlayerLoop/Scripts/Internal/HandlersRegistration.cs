@@ -59,6 +59,18 @@ namespace Debri.PlayerLoop.Internal
         registration.Initialize(handlersOwner);
         return registration;
       }
+
+      public static void Clear() =>
+        _pool.Clear();
     }
+
+#if UNITY_EDITOR
+    [Common.Editor.FinalizeOnPlayModeExitMethod]
+    private static void FinalizeOnPlayModeExit()
+    {
+      _systemsMap.Clear();
+      Pool.Clear();
+    }
+#endif
   }
 }
