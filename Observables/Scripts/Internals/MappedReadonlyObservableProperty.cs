@@ -39,16 +39,12 @@ namespace Debri.Observables.Internals
 
       public void OnCompleted()
       {
-        foreach (IObserver<TValue> observer in _property.Observers)
-          observer.OnCompleted();
+        _property.InvokeOnCompleted();
         _property.Dispose();
       }
 
-      public void OnError(Exception error)
-      {
-        foreach (IObserver<TValue> observer in _property.Observers)
-          observer.OnError(error);
-      }
+      public void OnError(Exception error) =>
+        _property.InvokeOnError(error);
 
       public void OnNext(TSourceValue sourceValue)
       {
@@ -56,8 +52,7 @@ namespace Debri.Observables.Internals
         if (Equals(_property.Value, value)) return;
 
         _property.Value = value;
-        foreach (IObserver<TValue> observer in _property.Observers)
-          observer.OnNext(_property.Value);
+        _property.InvokeOnNext(_property.Value);
       }
     }
   }

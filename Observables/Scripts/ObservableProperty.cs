@@ -22,13 +22,7 @@ namespace Debri.Observables
         if (!Validate(_currentValue, ref value)) return;
 
         _currentValue = value;
-
-        using (ListPool<IObserver<TValue>>.Get(out List<IObserver<TValue>> observers))
-        {
-          observers.AddRange(Observers);
-          foreach (IObserver<TValue> observer in observers)
-            observer.OnNext(value);
-        }
+        InvokeOnNext(value);
       }
     }
 
