@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Debri.Pools.Internals;
+using UnityEngine;
 
 namespace Debri.Pools
 {
@@ -10,12 +11,12 @@ namespace Debri.Pools
   [DefaultExecutionOrder(-1000)]
   public class GlobalPoolsSettings : MonoBehaviour
   {
-    [SerializeField] private Transform _defaultPoolItemsParent;
+    [SerializeField] private Transform _itemsContainer;
 
     private void Awake() =>
-      GlobalPools.DefaultPoolItemsParent = _defaultPoolItemsParent;
+      gameObject.scene.SetSettings(this);
 
-    private void OnDestroy() =>
-      GlobalPools.DefaultPoolItemsParent = null;
+    internal bool TryGetContainer(out Transform container) =>
+      container = _itemsContainer;
   }
 }

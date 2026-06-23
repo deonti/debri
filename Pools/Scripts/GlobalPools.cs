@@ -2,6 +2,7 @@
 using Debri.Pools.Internals;
 using UnityEngine;
 using UnityEngine.Pool;
+using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 namespace Debri.Pools
@@ -20,7 +21,6 @@ namespace Debri.Pools
     internal const bool SuppressWarnings = false;
 #endif
 
-    internal static Transform DefaultPoolItemsParent;
     private static readonly Dictionary<(Object, Object), IObjectPool<GameObject>> _poolsMap = new();
 
 #if UNITY_EDITOR
@@ -49,7 +49,15 @@ namespace Debri.Pools
       if (prototypeParent)
         return InternalGet(prototype, prototypeParent);
 
-      return InternalGet(prototype, DefaultPoolItemsParent);
+      Scene prototypeScene = prototype.scene;
+      if (prototypeScene.IsValid())
+        return InternalGet(prototype, prototypeScene.GetPoolItemsContainer());
+
+      Scene activeScene = SceneManager.GetActiveScene();
+      if (!SuppressWarnings)
+        Debug.Log($"Can't determine pool container ownership for {prototype.name}. The active scene ({activeScene.name}) container will be used.", prototype);
+
+      return InternalGet(prototype, activeScene.GetPoolItemsContainer());
     }
 
     /// <summary>
