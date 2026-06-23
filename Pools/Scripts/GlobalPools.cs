@@ -15,7 +15,11 @@ namespace Debri.Pools
   /// </remarks>
   public static class GlobalPools
   {
-    internal static bool SuppressWarnings;
+#if DEBRI_POOLS_SUPPRESS_WARNINGS
+    internal const bool SuppressWarnings = true;
+#else
+    internal const bool SuppressWarnings = false;
+#endif
 
     internal static Transform DefaultPoolItemsParent
     {
