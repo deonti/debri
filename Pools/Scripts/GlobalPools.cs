@@ -51,14 +51,26 @@ namespace Debri.Pools
 
       Scene prototypeScene = prototype.scene;
       if (prototypeScene.IsValid())
-        return InternalGet(prototype, prototypeScene.GetPoolItemsContainer());
+        return Get(prototype, prototypeScene);
 
       Scene activeScene = SceneManager.GetActiveScene();
       if (!SuppressWarnings)
         Debug.Log($"Can't determine pool container ownership for {prototype.name}. The active scene ({activeScene.name}) container will be used.", prototype);
 
-      return InternalGet(prototype, activeScene.GetPoolItemsContainer());
+      return Get(prototype, activeScene);
     }
+
+    /// <summary>
+    /// Gets or creates a pool of game objects.
+    /// </summary>
+    /// <param name="prototype">Prototype of pool items.</param>
+    /// <param name="containerScene">Scene with container for pool items. If scene does not contain a container, one will be created.</param>
+    /// <returns>Pool associated with the specified prototype.</returns>
+    /// <remarks>
+    /// Every prototype is associated with a single pool.
+    /// </remarks>
+    public static IObjectPool<GameObject> Get(GameObject prototype, Scene containerScene) =>
+      InternalGet(prototype, containerScene.GetPoolItemsContainer());
 
     /// <summary>
     /// Gets or creates a pool of components.
@@ -73,6 +85,20 @@ namespace Debri.Pools
     public static IObjectPool<TComponent> Get<TComponent>(TComponent prototype, Transform container = null)
       where TComponent : Component =>
       new ComponentPoolWrapper<TComponent>(Get(prototype.gameObject, container));
+
+    /// <summary>
+    /// Gets or creates a pool of components.
+    /// </summary>
+    /// <typeparam name="TComponent">Type of pool items.</typeparam>
+    /// <param name="prototype">Prototype of pool items.</param>
+    /// <param name="containerScene">Scene with container for pool items. If scene does not contain a container, one will be created.</param>
+    /// <returns>Pool associated with the specified prototype.</returns>
+    /// <remarks>
+    /// Technically, it returns the same pool as calling <see cref="Get(GameObject, Scene)"/> with the prototype's game object.
+    /// </remarks>
+    public static IObjectPool<TComponent> Get<TComponent>(TComponent prototype, Scene containerScene)
+      where TComponent : Component =>
+      new ComponentPoolWrapper<TComponent>(Get(prototype.gameObject, containerScene));
 
     /// <summary>
     /// Gets or creates a pool of game objects with persistent container.
@@ -109,6 +135,16 @@ namespace Debri.Pools
       prototype ? Get(prototype, container) : defaultValue;
 
     /// <summary>
+    /// Gets or creates a pool of game objects or a default value if the specified prototype is null.
+    /// </summary>
+    /// <param name="prototype">Prototype of pool items.</param>
+    /// <param name="containerScene">Scene with container for pool items. If scene does not contain a container, one will be created.</param>
+    /// <param name="defaultValue">Default pool to return if the specified prototype is null.</param>
+    /// <returns>Pool associated with the specified prototype or the default pool.</returns>
+    public static IObjectPool<GameObject> GetOrDefault(GameObject prototype, Scene containerScene, IObjectPool<GameObject> defaultValue = null) =>
+      prototype ? Get(prototype, containerScene) : defaultValue;
+
+    /// <summary>
     /// Gets or creates a pool of components or a default value if the specified prototype is null.
     /// </summary>
     /// <typeparam name="TComponent">Type of pool items.</typeparam>
@@ -119,6 +155,18 @@ namespace Debri.Pools
     public static IObjectPool<TComponent> GetOrDefault<TComponent>(TComponent prototype, Transform container = null, IObjectPool<TComponent> defaultValue = null)
       where TComponent : Component =>
       prototype ? Get(prototype, container) : defaultValue;
+
+    /// <summary>
+    /// Gets or creates a pool of components or a default value if the specified prototype is null.
+    /// </summary>
+    /// <typeparam name="TComponent">Type of pool items.</typeparam>
+    /// <param name="prototype">Prototype of pool items.</param>
+    /// <param name="containerScene">Scene with container for pool items. If scene does not contain a container, one will be created.</param>
+    /// <param name="defaultValue">Default pool to return if the specified prototype is null.</param>
+    /// <returns>Pool associated with the specified prototype or the default pool.</returns>
+    public static IObjectPool<TComponent> GetOrDefault<TComponent>(TComponent prototype, Scene containerScene, IObjectPool<TComponent> defaultValue = null)
+      where TComponent : Component =>
+      prototype ? Get(prototype, containerScene) : defaultValue;
 
     /// <summary>
     /// Gets or creates a pool of game objects with persistent container or a default value if the specified prototype is null.
