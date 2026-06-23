@@ -11,10 +11,10 @@ namespace Debri.Pools.Internals
     private readonly Transform _container;
     private readonly List<GameObjectPoolItem> _items;
 
-    public GameObjectPool(GameObject prototype)
+    public GameObjectPool(GameObject prototype, Transform container)
     {
       _prototype = prototype;
-      _container = _prototype.transform.parent ? _prototype.transform.parent : GlobalPools.DefaultPoolItemsParent;
+      _container = container;
       _items = new List<GameObjectPoolItem>();
       SceneManager.sceneUnloaded += RemoveInvalids;
     }

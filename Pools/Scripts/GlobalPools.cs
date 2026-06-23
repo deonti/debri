@@ -22,7 +22,6 @@ namespace Debri.Pools
 
     internal static Transform DefaultPoolItemsParent;
     private static readonly Dictionary<Object, IObjectPool<GameObject>> _poolsMap = new();
-    private static Transform _defaultPoolItemsParent;
 
 #if UNITY_EDITOR
     [UnityEditor.InitializeOnEnterPlayMode]
@@ -77,6 +76,6 @@ namespace Debri.Pools
       prototype ? Get(prototype) : defaultValue;
 
     private static IObjectPool<GameObject> NewGameObjectPool(GameObject prototype) =>
-      new GameObjectPool(prototype);
+      new GameObjectPool(prototype, prototype.transform.parent ? prototype.transform.parent : DefaultPoolItemsParent);
   }
 }
