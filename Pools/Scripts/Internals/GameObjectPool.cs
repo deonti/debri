@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Debri.Common;
 using UnityEngine;
 using UnityEngine.Pool;
-using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 namespace Debri.Pools.Internals
 {
@@ -10,13 +12,15 @@ namespace Debri.Pools.Internals
     private readonly GameObject _prototype;
     private readonly Transform _container;
     private readonly List<GameObjectPoolItem> _items;
+    private bool _isContainerDestroyed;
 
     public GameObjectPool(GameObject prototype, Transform container)
     {
       _prototype = prototype;
       _container = container;
       _items = new List<GameObjectPoolItem>();
-      SceneManager.sceneUnloaded += RemoveInvalids;
+      if (_container)
+        _container.gameObject.SubscribeToOnDestroy(() => _isContainerDestroyed = true);
     }
 
     public PooledObject<GameObject> Get(out GameObject instance) =>
@@ -24,6 +28,9 @@ namespace Debri.Pools.Internals
 
     public GameObject Get()
     {
+      if (_isContainerDestroyed)
+        throw new InvalidOperationException($"Can't return pool item {_prototype.name} because container has been destroyed");
+
       GameObjectPoolItem item;
       if (_items.Count == 0)
         item = InstantiateItem();
@@ -43,6 +50,12 @@ namespace Debri.Pools.Internals
 
       var item = instance.GetComponent<GameObjectPoolItem>();
       item.ProcessRelease();
+      if (_isContainerDestroyed)
+      {
+        Object.Destroy(item.gameObject);
+        return;
+      }
+
       _items.Add(item);
     }
 
@@ -66,9 +79,6 @@ namespace Debri.Pools.Internals
 
     private GameObjectPoolItem InstantiateItem() =>
       GameObjectPoolItem.Instantiate(this, _prototype, _container);
-
-    private void RemoveInvalids(Scene _) =>
-      _items.RemoveAll(item => !item);
 
     void IPrewarmable.Prewarm(int count)
     {
