@@ -16,11 +16,13 @@ namespace Debri.Pools.Internals
 
     public GameObjectPool(GameObject prototype, Transform container)
     {
+      if (!container)
+        throw new InvalidOperationException("Container must be specified");
+
       _prototype = prototype;
       _container = container;
       _items = new List<GameObjectPoolItem>();
-      if (_container)
-        _container.gameObject.SubscribeToOnDestroy(() => _isContainerDestroyed = true);
+      _container.gameObject.SubscribeToOnDestroy(() => _isContainerDestroyed = true);
     }
 
     public PooledObject<GameObject> Get(out GameObject instance) =>
