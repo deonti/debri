@@ -21,7 +21,7 @@ namespace Debri.Pools
 #endif
 
     internal static Transform DefaultPoolItemsParent;
-    private static readonly Dictionary<Object, IObjectPool<GameObject>> _poolsMap = new();
+    private static readonly Dictionary<(Object, Object), IObjectPool<GameObject>> _poolsMap = new();
 
 #if UNITY_EDITOR
     [UnityEditor.InitializeOnEnterPlayMode]
@@ -37,10 +37,13 @@ namespace Debri.Pools
     /// <remarks>
     /// Every prototype is associated with a single pool.
     /// </remarks>
-    public static IObjectPool<GameObject> Get(GameObject prototype) =>
-      _poolsMap.TryGetValue(prototype, out IObjectPool<GameObject> pool)
+    public static IObjectPool<GameObject> Get(GameObject prototype)
+    {
+      Transform container = prototype.transform.parent ? prototype.transform.parent : DefaultPoolItemsParent;
+      return _poolsMap.TryGetValue((prototype, container), out IObjectPool<GameObject> pool)
         ? pool
-        : _poolsMap[prototype] = NewGameObjectPool(prototype);
+        : _poolsMap[(prototype, container)] = NewGameObjectPool(prototype, container);
+    }
 
     /// <summary>
     /// Gets or creates a pool of components.
@@ -75,7 +78,7 @@ namespace Debri.Pools
       where TComponent : Component =>
       prototype ? Get(prototype) : defaultValue;
 
-    private static IObjectPool<GameObject> NewGameObjectPool(GameObject prototype) =>
-      new GameObjectPool(prototype, prototype.transform.parent ? prototype.transform.parent : DefaultPoolItemsParent);
+    private static IObjectPool<GameObject> NewGameObjectPool(GameObject prototype, Transform container) =>
+      new GameObjectPool(prototype, container);
   }
 }
