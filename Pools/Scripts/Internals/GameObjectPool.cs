@@ -56,6 +56,7 @@ namespace Debri.Pools.Internals
         return;
       }
 
+      item.transform.SetParent(_container, worldPositionStays: false);
       _items.Add(item);
     }
 
