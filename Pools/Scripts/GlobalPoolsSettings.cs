@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Debri.Pools.Internals;
 using UnityEngine;
 
 namespace Debri.Pools
@@ -11,27 +11,12 @@ namespace Debri.Pools
   [DefaultExecutionOrder(-1000)]
   public class GlobalPoolsSettings : MonoBehaviour
   {
-    [SerializeField] private Transform _defaultPoolItemsParent;
-    [SerializeField] private bool _suppressWarnings;
+    [SerializeField] private Transform _itemsContainer;
 
-    private static GlobalPoolsSettings _instance;
+    private void Awake() =>
+      gameObject.scene.SetSettings(this);
 
-    private void Awake()
-    {
-      if (_instance)
-        throw new InvalidOperationException("Only one GlobalPoolsController can exist at a time.");
-
-      _instance = this;
-
-      GlobalPools.DefaultPoolItemsParent = _defaultPoolItemsParent;
-      GlobalPools.SuppressWarnings = _suppressWarnings;
-    }
-
-    private void OnDestroy()
-    {
-      _instance = null;
-      GlobalPools.DefaultPoolItemsParent = null;
-      GlobalPools.SuppressWarnings = false;
-    }
+    internal bool TryGetContainer(out Transform container) =>
+      container = _itemsContainer;
   }
 }

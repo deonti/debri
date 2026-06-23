@@ -48,5 +48,52 @@ namespace Debri.Common
 
       return component;
     }
+
+    /// <summary>
+    /// Subscribes a handler to be called when the game object is destroyed.
+    /// </summary>
+    /// <param name="gameObject">
+    /// The game object to observe.
+    /// </param>
+    /// <param name="handler">
+    /// The action to invoke on destruction.
+    /// </param>
+    /// <returns>
+    /// <see cref="IDisposable"/> token to cancel the subscription.
+    /// </returns>
+    public static IDisposable SubscribeToOnDestroy(this GameObject gameObject, Action handler) =>
+      GetOrAddComponent<Agent>(gameObject).SubscribeToOnDestroy(handler);
+
+    [DefaultExecutionOrder(-1001)]
+    private class Agent : MonoBehaviour
+    {
+      private Action _destroyHandlers;
+
+      private void OnDestroy() =>
+        _destroyHandlers?.Invoke();
+
+      public IDisposable SubscribeToOnDestroy(Action handler) =>
+        new Subscription(this, handler);
+
+      private class Subscription : IDisposable
+      {
+        private readonly Agent _owner;
+        private readonly Action _handler;
+
+        public Subscription(Agent owner, Action handler)
+        {
+          _owner = owner;
+          _handler = handler;
+          _owner._destroyHandlers += _handler;
+        }
+
+        public void Dispose()
+        {
+          if (!_owner) return;
+
+          _owner._destroyHandlers -= _handler;
+        }
+      }
+    }
   }
 }
