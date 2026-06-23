@@ -35,25 +35,36 @@ namespace Debri.Pools
     /// Gets or creates a pool of game objects.
     /// </summary>
     /// <param name="prototype">Prototype of pool items.</param>
+    /// <param name="container">Container for pool items.</param>
     /// <returns>Pool associated with the specified prototype.</returns>
     /// <remarks>
     /// Every prototype is associated with a single pool.
     /// </remarks>
-    public static IObjectPool<GameObject> Get(GameObject prototype) =>
-      InternalGet(prototype, prototype.transform.parent ? prototype.transform.parent : DefaultPoolItemsParent);
+    public static IObjectPool<GameObject> Get(GameObject prototype, Transform container = null)
+    {
+      if (container)
+        return InternalGet(prototype, container);
+
+      Transform prototypeParent = prototype.transform.parent;
+      if (prototypeParent)
+        return InternalGet(prototype, prototypeParent);
+
+      return InternalGet(prototype, DefaultPoolItemsParent);
+    }
 
     /// <summary>
     /// Gets or creates a pool of components.
     /// </summary>
     /// <typeparam name="TComponent">Type of pool items.</typeparam>
     /// <param name="prototype">Prototype of pool items.</param>
+    /// <param name="container">Container for pool items.</param>
     /// <returns>Pool associated with the specified prototype.</returns>
     /// <remarks>
-    /// Technically, it returns the same pool as calling <see cref="Get(GameObject)"/> with the prototype's game object.
+    /// Technically, it returns the same pool as calling <see cref="Get(GameObject, Transform)"/> with the prototype's game object.
     /// </remarks>
-    public static IObjectPool<TComponent> Get<TComponent>(TComponent prototype)
+    public static IObjectPool<TComponent> Get<TComponent>(TComponent prototype, Transform container = null)
       where TComponent : Component =>
-      new ComponentPoolWrapper<TComponent>(Get(prototype.gameObject));
+      new ComponentPoolWrapper<TComponent>(Get(prototype.gameObject, container));
 
     /// <summary>
     /// Gets or creates a pool of game objects with persistent container.
@@ -83,21 +94,23 @@ namespace Debri.Pools
     /// Gets or creates a pool of game objects or a default value if the specified prototype is null.
     /// </summary>
     /// <param name="prototype">Prototype of pool items.</param>
+    /// <param name="container">Container for pool items.</param>
     /// <param name="defaultValue">Default pool to return if the specified prototype is null.</param>
     /// <returns>Pool associated with the specified prototype or the default pool.</returns>
-    public static IObjectPool<GameObject> GetOrDefault(GameObject prototype, IObjectPool<GameObject> defaultValue = null) =>
-      prototype ? Get(prototype) : defaultValue;
+    public static IObjectPool<GameObject> GetOrDefault(GameObject prototype, Transform container = null, IObjectPool<GameObject> defaultValue = null) =>
+      prototype ? Get(prototype, container) : defaultValue;
 
     /// <summary>
     /// Gets or creates a pool of components or a default value if the specified prototype is null.
     /// </summary>
     /// <typeparam name="TComponent">Type of pool items.</typeparam>
     /// <param name="prototype">Prototype of pool items.</param>
+    /// <param name="container">Container for pool items.</param>
     /// <param name="defaultValue">Default pool to return if the specified prototype is null.</param>
     /// <returns>Pool associated with the specified prototype or the default pool.</returns>
-    public static IObjectPool<TComponent> GetOrDefault<TComponent>(TComponent prototype, IObjectPool<TComponent> defaultValue = null)
+    public static IObjectPool<TComponent> GetOrDefault<TComponent>(TComponent prototype, Transform container = null, IObjectPool<TComponent> defaultValue = null)
       where TComponent : Component =>
-      prototype ? Get(prototype) : defaultValue;
+      prototype ? Get(prototype, container) : defaultValue;
 
     /// <summary>
     /// Gets or creates a pool of game objects with persistent container or a default value if the specified prototype is null.
