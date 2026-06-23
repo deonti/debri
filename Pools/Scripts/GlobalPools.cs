@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Debri.Pools.Internals;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -21,20 +20,7 @@ namespace Debri.Pools
     internal const bool SuppressWarnings = false;
 #endif
 
-    internal static Transform DefaultPoolItemsParent
-    {
-      get => _defaultPoolItemsParent;
-      set
-      {
-        if (_defaultPoolItemsParent == value) return;
-
-        _defaultPoolItemsParent = value;
-        OnDefaultPoolItemsParentChanged?.Invoke();
-      }
-    }
-
-    internal static event Action OnDefaultPoolItemsParentChanged;
-
+    internal static Transform DefaultPoolItemsParent;
     private static readonly Dictionary<Object, IObjectPool<GameObject>> _poolsMap = new();
     private static Transform _defaultPoolItemsParent;
 

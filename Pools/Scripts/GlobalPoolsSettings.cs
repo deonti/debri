@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Debri.Pools
 {
@@ -13,22 +12,10 @@ namespace Debri.Pools
   {
     [SerializeField] private Transform _defaultPoolItemsParent;
 
-    private static GlobalPoolsSettings _instance;
-
-    private void Awake()
-    {
-      if (_instance)
-        throw new InvalidOperationException("Only one GlobalPoolsController can exist at a time.");
-
-      _instance = this;
-
+    private void Awake() =>
       GlobalPools.DefaultPoolItemsParent = _defaultPoolItemsParent;
-    }
 
-    private void OnDestroy()
-    {
-      _instance = null;
+    private void OnDestroy() =>
       GlobalPools.DefaultPoolItemsParent = null;
-    }
   }
 }

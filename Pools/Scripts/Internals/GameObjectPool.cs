@@ -8,7 +8,7 @@ namespace Debri.Pools.Internals
   internal class GameObjectPool : IObjectPool<GameObject>, IPrewarmable
   {
     private readonly GameObject _prototype;
-    private Transform _container;
+    private readonly Transform _container;
     private readonly List<GameObjectPoolItem> _items;
 
     public GameObjectPool(GameObject prototype)
@@ -16,9 +16,6 @@ namespace Debri.Pools.Internals
       _prototype = prototype;
       _container = _prototype.transform.parent ? _prototype.transform.parent : GlobalPools.DefaultPoolItemsParent;
       _items = new List<GameObjectPoolItem>();
-
-      if (_container == GlobalPools.DefaultPoolItemsParent)
-        GlobalPools.OnDefaultPoolItemsParentChanged += () => _container = GlobalPools.DefaultPoolItemsParent;
       SceneManager.sceneUnloaded += RemoveInvalids;
     }
 
