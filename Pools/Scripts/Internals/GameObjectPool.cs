@@ -39,7 +39,7 @@ namespace Debri.Pools.Internals
       else
       {
         item = _items[^1];
-        _items.Remove(item);
+        _items.RemoveAt(_items.Count - 1);
       }
 
       item.ProcessGet();
