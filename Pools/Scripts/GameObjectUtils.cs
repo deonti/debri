@@ -1,4 +1,5 @@
 ﻿using System;
+using Debri.Common;
 using Debri.Pools.Internals;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -24,14 +25,30 @@ namespace Debri.Pools
     /// Adds a handler that will be called once when the next release of the instance occurs.
     /// </summary>
     /// <param name="instance">The instance to add the handler to.</param>
-    /// <param name="onRelease">The handler to call when the next release occurs.</param>
+    /// <param name="handler">The handler to call when the next release occurs.</param>
     /// <exception cref="ArgumentException">Thrown if the instance is not pooled.</exception>
-    public static void ScheduleReleaseHandler(this GameObject instance, Action onRelease)
+    public static void ScheduleReleaseHandler(this GameObject instance, Action handler)
     {
-      if (!instance.TryGetComponent(out GameObjectPoolItem agent))
+      if (!instance.TryGetComponent(out GameObjectPoolItem poolItem))
         throw new ArgumentException($"Instance {instance.name} is not pooled. Release handler will not be added.");
 
-      agent.ScheduleReleaseHandler(onRelease);
+      poolItem.ScheduleReleaseHandler(handler, callByDestroy: false);
+    }
+
+    /// <summary>
+    /// Adds a handler that will be called once when the instance is next released to the pool or destroyed.
+    /// </summary>
+    /// <param name="instance">The instance to add the handler to.</param>
+    /// <param name="handler">The handler to call when the next release or destruction occurs.</param>
+    public static void ScheduleReleaseOrDestroyHandler(this GameObject instance, Action handler)
+    {
+      if (!instance.TryGetComponent(out GameObjectPoolItem poolItem))
+      {
+        instance.SubscribeToOnDestroy(handler);
+        return;
+      }
+
+      poolItem.ScheduleReleaseHandler(handler, callByDestroy: true);
     }
 
     /// <summary>

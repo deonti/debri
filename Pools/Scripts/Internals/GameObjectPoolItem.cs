@@ -10,7 +10,7 @@ namespace Debri.Pools.Internals
   {
     public GameObjectPool Owner { get; private set; }
 
-    private readonly Queue<Action> _scheduledReleaseHandlers = new();
+    private readonly Queue<ReleaseHandlerInfo> _scheduledReleaseHandlers = new();
 
     private void OnDestroy()
     {
@@ -18,6 +18,9 @@ namespace Debri.Pools.Internals
         Owner.LogWarning($"Pool item {gameObject.name} has been destroyed and will be removed from pool");
 
       Owner.Remove(this);
+      while (_scheduledReleaseHandlers.TryDequeue(out ReleaseHandlerInfo handlerInfo))
+        if (handlerInfo.CallByDestroy)
+          handlerInfo.Handler();
     }
 
     public static GameObjectPoolItem Instantiate(GameObjectPool owner, GameObject prototype, Transform parent)
@@ -42,13 +45,25 @@ namespace Debri.Pools.Internals
     {
       foreach (IPoolItemReleaseHandler releaseHandler in GetComponents<IPoolItemReleaseHandler>())
         releaseHandler.OnRelease();
-      while (_scheduledReleaseHandlers.TryDequeue(out Action onRelease))
-        onRelease();
+      while (_scheduledReleaseHandlers.TryDequeue(out ReleaseHandlerInfo handlerInfo))
+        handlerInfo.Handler();
 
       gameObject.SetActive(false);
     }
 
-    public void ScheduleReleaseHandler(Action onRelease) =>
-      _scheduledReleaseHandlers.Enqueue(onRelease);
+    public void ScheduleReleaseHandler(Action handler, bool callByDestroy) =>
+      _scheduledReleaseHandlers.Enqueue(new ReleaseHandlerInfo(handler, callByDestroy));
+
+    private readonly struct ReleaseHandlerInfo
+    {
+      public readonly Action Handler;
+      public readonly bool CallByDestroy;
+
+      public ReleaseHandlerInfo(Action handler, bool callByDestroy)
+      {
+        Handler = handler;
+        CallByDestroy = callByDestroy;
+      }
+    }
   }
 }
