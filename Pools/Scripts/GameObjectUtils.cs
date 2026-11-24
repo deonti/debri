@@ -14,7 +14,7 @@ namespace Debri.Pools
     /// <param name="instance">The instance to release or destroy.</param>
     public static void ReleaseOrDestroy(this GameObject instance)
     {
-      if (instance.TryGetOwner(out IObjectPool<GameObject> pool))
+      if (instance.TryGetSourcePool(out IObjectPool<GameObject> pool))
         pool.Release(instance);
       else
         Object.Destroy(instance);
@@ -34,7 +34,13 @@ namespace Debri.Pools
       agent.ScheduleReleaseHandler(onRelease);
     }
 
-    private static bool TryGetOwner(this GameObject instance, out IObjectPool<GameObject> pool) =>
-      (pool = instance.TryGetComponent(out GameObjectPoolItem agent) ? agent.Owner : null) is not null;
+    /// <summary>
+    /// Gets the pool from which the instance was created, if it is pooled.
+    /// </summary>
+    /// <param name="instance">The instance to get the source pool for.</param>
+    /// <param name="pool">When this method returns, contains the pool from which the instance was created, if found; otherwise, <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if the instance was created from a pool; otherwise, <see langword="false"/>.</returns>
+    public static bool TryGetSourcePool(this GameObject instance, out IObjectPool<GameObject> pool) =>
+      (pool = instance.TryGetComponent(out GameObjectPoolItem poolItem) ? poolItem.Owner : null) is not null;
   }
 }
